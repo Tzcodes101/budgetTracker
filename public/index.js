@@ -146,6 +146,7 @@ function sendTransaction(isAdding) {
   })
   .catch(err => {
     // fetch failed, so save in indexed db
+    //check if service worker registered if saveRecord not working
     saveRecord(transaction);
 
     // clear form
