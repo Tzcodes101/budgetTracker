@@ -1,4 +1,3 @@
-//prefixes for implementation want to test
 const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
 
 if (!window.indexedDB) {
@@ -8,21 +7,20 @@ if (!window.indexedDB) {
 let db;
 const request = indexedDB.open("budget", 1);
 
-
 request.onupgradeneeded = ({ target }) => {
     let db = target.result;
-    db.createObjectStore("pending", { autoIncrement: true });
+    db.createObjectStore("pending", { autoincrement: true });
 };
 
 request.onsuccess = ({ target }) => {
     db = target.result;
     if (navigator.onLine) {
         checkDatabase();
-    }
-}
+    };
+};
 
-request.onerror = function (e) {
-    console.log("Error " + e.target.errorCode);
+request.onerror = function(e) {
+    console.log("Error" + e.target.errorCode);
 };
 
 function saveRecord(data) {
@@ -44,18 +42,18 @@ function checkDatabase() {
                 method: "POST",
                 body: JSON.stringify(getAll.result),
                 headers: {
-                    Accept: "application/json, text/plain, */*",
-                    "Content-Type": "application/json"
+                    Accept: "application/json, text/plain, */*", 
+                    "Content-Type": "applicaiton/json"
                 }
             })
-                .then(res => {
-                    res.json();
-                })
-                .then(() => {
-                    const trans = db.transaction(["pending"], "readwrite");
-                    const store = trans.objectStore("pending");
-                    store.clear();
-                })
+            .then(res => {
+                res.json();
+            })
+            .then(() => {
+                const trans = db.transaction(["pending"], "readwrite");
+                const store = trans.objectStore("pending");
+                store.clear();
+            })
         }
     }
-};      
+};
