@@ -47,12 +47,6 @@ self.addEventListener('fetch', (event) => {
   if (event.request.url.includes('/api/')) {
     console.log('[Service Worker] Fetch(data)', event.request.url)
     event.respondWith(
-      // caches.match(event.request).then((cachedResponse) => {
-      //   if (cachedResponse) {
-      //     return cachedResponse;
-      //   }
-
-      // return 
       caches.open(DATA_CACHE_NAME).then((cache) => {
         return fetch(event.request)
           .then(response => {
@@ -75,6 +69,4 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
-  // return cache.put(event.request, response.clone()).then(() => {
-  //   return response;
-  // });
+
