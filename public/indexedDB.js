@@ -31,7 +31,6 @@ function saveRecord(data) {
     const store = trans.objectStore("pending");
   
     store.add(data);
-
 }
 
 function checkDatabase() {
@@ -43,7 +42,7 @@ function checkDatabase() {
         if (getAll.result.length > 0) {
             fetch("/api/transaction/bulk", {
                 method: "POST",
-                body: JSON.stringify(gatAll.result),
+                body: JSON.stringify(getAll.result),
                 headers: {
                     Accept: "application/json, text/plain, */*",
                     "Content-Type": "application/json"
