@@ -31,7 +31,7 @@ function saveRecord(data) {
     const store = trans.objectStore("pending");
   
     store.add(data);
-}
+};
 
 function checkDatabase() {
     const trans = db.transaction(["pending"], "readwrite");
