@@ -1,27 +1,62 @@
 //prefixes for implementation want to test
+const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
 
-//declare db and request to open db
+if (!window.indexedDB) {
+    console.log("Your browser doesn't support a stable version of IndexedDB. Such and such feature will not be available.");
+};
 
- //onupgradeneeded (schema)
- //On install, create bulk (pending) collection and save to indexDB
+let db;
+const request = indexedDB.open("budget", 1);
 
-//activate (onsuccess)
-    //check if app online before reading from db
-    //checkDatabase (if online)
 
-//on error
+request.onupgradeneeded = ({ target }) => {
+    let db = target.result;
+    db.createObjectStore("pending", { autoIncrement: true });
+};
 
- //saveRecord (save to index db incase install fails)
- function saveRecord(data) {
-    console.log(data);
-       
+request.onsuccess = ({ target }) => {
+    db = target.result;
+    if (navigator.onLine) {
+        checkDatabase();
+    }
 }
 
-//checkDatabase, ref db + store
-    //getAll onsuccess
-    //if something in bulk, going to post it (bc back online)
+request.onerror = function (e) {
+    console.log("Error " + e.target.errorCode);
+};
 
-    //.then (turn response into json)
-    //.then delete records if successful
+function saveRecord(data) {
+    console.log(data);
+    const trans = db.transaction(["pending"], "readwrite");
+    const store = trans.objectStore("pending");
+  
+    store.add(data);
 
-//listen to when back online and save records
+}
+
+function checkDatabase() {
+    const trans = db.transaction(["pending"], "readwrite");
+    const store = trans.objectStore("pending");
+    const getAll = store.getAll();
+
+    getAll.onsuccess = function () {
+        if (getAll.result.length > 0) {
+            fetch("/api/transaction/bulk", {
+                method: "POST",
+                body: JSON.stringify(gatAll.result),
+                headers: {
+                    Accept: "application/json, text/plain, */*",
+                    "Content-Type": "application/json"
+                }
+            })
+                .then(res => {
+                    res.json();
+                })
+                .then(() => {
+                    const trans = db.transaction(["pending"], "readwrite");
+                    const store = trans.objectStore("pending");
+                    store.clear();
+                })
+        }
+    }
+};      
