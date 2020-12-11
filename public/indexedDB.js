@@ -7,13 +7,25 @@ if (!window.indexedDB) {
 let db;
 const request = indexedDB.open("budget", 1);
 
-request.onupgradeneeded = ({ target }) => {
-    let db = target.result;
+// request.onupgradeneeded = ({ target }) => {
+//     let db = target.result;
+//     db.createObjectStore("pending", { autoincrement: true });
+// };
+
+request.onupgradeneeded = function(event) {
+    const db = event.target.result;
     db.createObjectStore("pending", { autoincrement: true });
 };
 
-request.onsuccess = ({ target }) => {
-    db = target.result;
+// request.onsuccess = ({ target }) => {
+//     db = target.result;
+//     if (navigator.onLine) {
+//         checkDatabase();
+//     };
+// };
+
+request.onsuccess = function(event) {
+    db = event.target.result;
     if (navigator.onLine) {
         checkDatabase();
     };
@@ -54,6 +66,12 @@ function checkDatabase() {
                 const store = trans.objectStore("pending");
                 store.clear();
             })
+            .catch(function(err) {
+                if(err) {
+                    console.log(err);
+                };
+            });
+        
         }
     }
 };

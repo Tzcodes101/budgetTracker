@@ -44,7 +44,8 @@ self.addEventListener(`activate`, event => {
 
 //fetch from caches
 self.addEventListener('fetch', (event) => {
-    if (event.request.url.startsWith(self.location.origin)) {
+    if (event.request.url.includes('/api')) {
+      console.log('[Service Worker] Fetch(data)', event.request.url )
       event.respondWith(
         caches.match(event.request).then((cachedResponse) => {
           if (cachedResponse) {
