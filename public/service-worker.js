@@ -3,6 +3,7 @@ const DATA_CACHE_NAME = "data-cache-v1";
 
 const FILES_TO_CACHE = [
   //add files to cache
+  "/",
   "./indexedDB.js",
   "./index.html",
   "./styles.css",
