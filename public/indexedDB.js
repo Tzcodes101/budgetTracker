@@ -8,22 +8,35 @@ if (!window.indexedDB) {
 let db;
 const request = indexedDB.open("budget", 1);
 
-//create and name object store as pending; want it to autoincrement 
-request.onupgradeneeded = function(event) {
-    const db = event.target.result;
-    db.createObjectStore("pending", { autoincrement: true });
-};
-
 //check for offline transactions if online
-request.onsuccess = function(event) {
+request.onsuccess = function (event) {
+    console.log("db initialized");
     db = event.target.result;
+    console.log(db);
     if (navigator.onLine) {
         checkDatabase();
     };
 };
 
+
+
+//create and name object store as pending; want it to autoincrement 
+request.onupgradeneeded = function (event) {
+    const db = event.target.result;
+    db.createObjectStore("pending", { autoincrement: true });
+    // db.onerror = function(event) {
+    //     console.log("trouble loading db" + event);
+    // }
+    // const store = db.createObjectStore("pending", { keyPath: "name" });
+
+
+    // var transaction = db.transaction(["pending"], "readwrite");
+
+};
+
+
 //note if there is an error
-request.onerror = function(e) {
+request.onerror = function (e) {
     console.log("Error" + e.target.errorCode);
 };
 
@@ -32,8 +45,12 @@ function saveRecord(data) {
     console.log(data);
     const transaction = db.transaction(["pending"], "readwrite");
     const store = transaction.objectStore("pending");
-  
-    store.add(data);
+    // var storeRequest = store.put("data", data);
+    var storeRequest = store.add(data);
+
+    storeRequest.onsuccess = function(event) {
+        console.log(event + "added successfully");
+    }
 };
 
 //open the transaction from the pending db to access the pending object store
@@ -42,7 +59,7 @@ function checkDatabase() {
     const transaction = db.transaction(["pending"], "readwrite");
     const store = transaction.objectStore("pending");
     const getAll = store.getAll();
-   
+
     //post everything in object store and post to the API
     //then clear store 
     getAll.onsuccess = function () {
@@ -51,26 +68,32 @@ function checkDatabase() {
                 method: "POST",
                 body: JSON.stringify(getAll.result),
                 headers: {
-                    Accept: "application/json, text/plain, */*", 
+                    Accept: "application/json, text/plain, */*",
                     "Content-Type": "applicaiton/json"
                 }
             })
-            .then(res => {
-                res.json();
-            })
-            .then(() => {
-                const transaction = db.transaction(["pending"], "readwrite");
-                const store = transaction.objectStore("pending");
-                store.clear();
-            })
-            .catch(function(err) {
-                if(err) {
-                    console.log(err);
-                };
-            });
-        
+                .then(res => {
+                    res.json();
+                })
+                .then(() => {
+                    const transaction = db.transaction(["pending"], "readwrite");
+                    const store = transaction.objectStore("pending");
+                    store.clear();
+                })
+                .catch(function (err) {
+                    if (err) {
+                        console.log(err);
+                    };
+                });
+
         }
     }
 };
+
+function deletePending() {
+    const transaction = db.transaction(["pending"], "readwrite");
+    const store = transaction.objectStore("pending");
+    store.clear();
+}
 
 window.addEventListener("online", checkDatabase);
